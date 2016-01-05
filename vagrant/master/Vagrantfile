@@ -76,6 +76,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
     systemctl enable lxc
     systemctl enable libvirtd
+
   EOF
 
   config.vm.provision :unix_reboot

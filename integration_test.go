@@ -5,10 +5,16 @@ package libvirt
 import (
 	"io/ioutil"
 	"os"
+	"regexp"
 	"strings"
 	"testing"
 	"time"
 )
+
+func get_ident_from_now() string {
+	bad_chars := regexp.MustCompile("[^a-zA-Z0-9]")
+	return bad_chars.ReplaceAllString(time.Now().String(), "_")
+}
 
 func defineTestLxcDomain(conn VirConnection, title string) (VirDomain, error) {
 	if title == "" {
@@ -43,7 +49,7 @@ func TestIntegrationGetMetadata(t *testing.T) {
 		return
 	}
 	defer conn.CloseConnection()
-	title := time.Now().String()
+	title := get_ident_from_now()
 	dom, err := defineTestLxcDomain(conn, title)
 	if err != nil {
 		t.Error(err)
@@ -123,7 +129,7 @@ func TestIntegrationGetSysinfo(t *testing.T) {
 func testNWFilterXML(name, chain string) string {
 	defName := name
 	if defName == "" {
-		defName = time.Now().String()
+		defName = get_ident_from_now()
 	}
 	return `<filter name='` + defName + `' chain='` + chain + `'>
             <rule action='drop' direction='out' priority='500'>
@@ -246,7 +252,7 @@ func TestIntegrationLookupNWFilterByName(t *testing.T) {
 		return
 	}
 	defer conn.CloseConnection()
-	origName := time.Now().String()
+	origName := get_ident_from_now()
 	filter, err := conn.NWFilterDefineXML(testNWFilterXML(origName, "ipv4"))
 	if err != nil {
 		t.Error(err)
@@ -279,7 +285,7 @@ func TestIntegrationLookupNWFilterByUUIDString(t *testing.T) {
 		return
 	}
 	defer conn.CloseConnection()
-	origName := time.Now().String()
+	origName := get_ident_from_now()
 	filter, err := conn.NWFilterDefineXML(testNWFilterXML(origName, "ipv4"))
 	if err != nil {
 		t.Error(err)
@@ -480,7 +486,7 @@ func TestStorageVolWipePattern(t *testing.T) {
 func testSecretTypeCephFromXML(name string) string {
 	var setName string
 	if name == "" {
-		setName = time.Now().String()
+		setName = get_ident_from_now()
 	} else {
 		setName = name
 	}
@@ -605,7 +611,7 @@ func TestIntegrationSecretGetUsageID(t *testing.T) {
 		return
 	}
 	defer conn.CloseConnection()
-	setUsageID := time.Now().String()
+	setUsageID := get_ident_from_now()
 	sec, err := conn.SecretDefineXML(testSecretTypeCephFromXML(setUsageID), 0)
 	if err != nil {
 		t.Error(err)
@@ -632,7 +638,7 @@ func TestIntegrationLookupSecretByUsage(t *testing.T) {
 		return
 	}
 	defer conn.CloseConnection()
-	usageID := time.Now().String()
+	usageID := get_ident_from_now()
 	sec, err := conn.SecretDefineXML(testSecretTypeCephFromXML(usageID), 0)
 	if err != nil {
 		t.Error(err)
@@ -654,7 +660,8 @@ func TestIntegrationGetDomainCPUStats(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer conn.CloseConnection()
-	dom, err := defineTestLxcDomain(conn, "")
+	title := get_ident_from_now()
+	dom, err := defineTestLxcDomain(conn, title)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -766,7 +773,7 @@ func TestIntergrationListAllNWFilters(t *testing.T) {
 	}
 	defer conn.CloseConnection()
 
-	testNWFilterName := time.Now().String()
+	testNWFilterName := get_ident_from_now()
 	filter, err := conn.NWFilterDefineXML(testNWFilterXML(testNWFilterName, "ipv4"))
 	if err != nil {
 		t.Error(err)
@@ -802,7 +809,8 @@ func TestIntegrationDomainBlockStatsFlags(t *testing.T) {
 	}
 	defer conn.CloseConnection()
 
-	dom, err := defineTestLxcDomain(conn, "")
+	title := get_ident_from_now()
+	dom, err := defineTestLxcDomain(conn, title)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -830,7 +838,8 @@ func TestIntegrationDomainInterfaceStats(t *testing.T) {
 	}
 	defer conn.CloseConnection()
 
-	dom, err := defineTestLxcDomain(conn, "")
+	title := get_ident_from_now()
+	dom, err := defineTestLxcDomain(conn, title)
 	if err != nil {
 		t.Fatal(err)
 	}

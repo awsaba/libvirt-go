@@ -492,7 +492,7 @@ func TestGetURI(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	origUri := "test:///default"
+	origUri := "test:/default"
 	if uri != origUri {
 		t.Fatalf("should be %s but got %s", origUri, uri)
 	}
