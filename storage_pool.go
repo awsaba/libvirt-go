@@ -1,7 +1,7 @@
 package libvirt
 
 /*
-#cgo LDFLAGS: -lvirt 
+#cgo LDFLAGS: -lvirt
 #include <libvirt/libvirt.h>
 #include <libvirt/virterror.h>
 #include <stdlib.h>
@@ -181,7 +181,8 @@ func (i *VirStoragePoolInfo) GetAvailableInBytes() uint64 {
 	return uint64(i.ptr.available)
 }
 
-func (p *VirStoragePool) StorageVolCreateXMLFromFile(xmlFile string, flags uint32) (VirStorageVol, error) {
+// StorageVolCreateXMLFile Convenience method to read XML configuration from a file
+func (p *VirStoragePool) StorageVolCreateXMLFile(xmlFile string, flags uint32) (VirStorageVol, error) {
 	xmlConfig, err := ioutil.ReadFile(xmlFile)
 	if err != nil {
 		return VirStorageVol{}, err
@@ -193,6 +194,16 @@ func (p *VirStoragePool) StorageVolCreateXML(xmlConfig string, flags uint32) (Vi
 	cXml := C.CString(string(xmlConfig))
 	defer C.free(unsafe.Pointer(cXml))
 	ptr := C.virStorageVolCreateXML(p.ptr, cXml, C.uint(flags))
+	if ptr == nil {
+		return VirStorageVol{}, GetLastError()
+	}
+	return VirStorageVol{ptr: ptr}, nil
+}
+
+func (p *VirStoragePool) StorageVolCreateXMLFrom(xmlConfig string, clonevol VirStorageVol, flags uint32) (VirStorageVol, error) {
+	cXml := C.CString(string(xmlConfig))
+	defer C.free(unsafe.Pointer(cXml))
+	ptr := C.virStorageVolCreateXMLFrom(p.ptr, cXml, clonevol.ptr, C.uint(flags))
 	if ptr == nil {
 		return VirStorageVol{}, GetLastError()
 	}

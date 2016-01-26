@@ -675,7 +675,7 @@ func TestIntegrationGetDomainCPUStats(t *testing.T) {
 		t.Fatal(err)
 	}
 	if ncpus != 1 {
-		t.Fatal("Number of CPUs should be 1")
+		t.Fatal("Number of CPUs should be 1, was: ", ncpus)
 	}
 
 	// ... if @params is NULL and @nparams is 0 and @ncpus is 1,
