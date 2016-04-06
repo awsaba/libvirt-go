@@ -240,6 +240,31 @@ func TestCreateDestroyDomain(t *testing.T) {
 	}
 }
 
+func TestCreateWithFlags(t *testing.T) {
+	dom, conn := buildTestDomain()
+	defer func() {
+		dom.Free()
+		conn.CloseConnection()
+	}()
+	if err := dom.CreateWithFlags(VIR_DOMAIN_START_PAUSED); err != nil {
+		t.Error(err)
+		return
+	}
+	state, err := dom.GetState()
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	if state[0] != VIR_DOMAIN_PAUSED {
+		t.Fatal("Domain should be paused")
+		return
+	}
+	if err = dom.Destroy(); err != nil {
+		t.Error(err)
+		return
+	}
+}
+
 func TestShutdownDomain(t *testing.T) {
 	dom, conn := buildTestDomain()
 	defer conn.CloseConnection()
